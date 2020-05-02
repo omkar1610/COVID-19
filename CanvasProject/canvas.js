@@ -10,31 +10,6 @@ canvas.height = height;
 var c = canvas.getContext('2d');
 
 
-// c.fillStyle = 'rgba(255,0,0,0.5)';
-// c.fillRect(100, 100, 100, 240);
-// console.log(canvas)
-
-
-// //Line
-// c.beginPath();
-// c.moveTo(50, 300);
-// c.lineTo(300, 700);
-// c.strokeStyle = "blue";
-// c.stroke();
-
-
-//Arc/Circle
-// for(var i = 0; i<50; i++){
-// 	var rad = 5;
-// 	var x = Math.random() * window.width;
-// 	var y = Math.random() * window.height;
-
-// 	c.beginPath();
-// 	c.arc(x, y, rad, 0, Math.PI * 2, false);
-// 	c.strokeStyle = "gray";
-// 	c.stroke();
-// }
-
 function Circle(x, y, dx, dy, rad){
 	this.x = x;
 	this.y = y;
@@ -72,7 +47,7 @@ function Circle(x, y, dx, dy, rad){
 var rad, x, y, dx, dy;
 
 var circleArray = [];
-var n = 20;
+var n = 1;
 
 for(var i = 0; i<n;i++){
 	rad = 30;
@@ -92,6 +67,8 @@ function animate() {
 	}
 	
 }
+
+
 
 
 animate();

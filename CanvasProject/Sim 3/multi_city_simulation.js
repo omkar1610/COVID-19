@@ -38,7 +38,7 @@ function init() {
 
   side_len = canvas_sim.height/3
   // Create N Circles
-  for(let i=0;i<N;i++){
+  for(var i=0;i<N;i++){
 
     let tmpCircle = new Circle();
     tmpCircle.form_circle(radius=Radius, randomIntFromRange(0, 2), randomIntFromRange(0, 2))
@@ -48,7 +48,6 @@ function init() {
       tmpCircle.color = 'red';
       infected++;
     }
-
     tmpCircle.id = i;
     tmpCircle.colArray = new Array(N).fill(0);
 

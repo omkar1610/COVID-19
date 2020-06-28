@@ -116,6 +116,112 @@ function go_from_center(circle) {
 
 }
 
+// Returns x and y coordinate inside circle.row/col/radius
+function square_loc(circle){
+  loc = {
+    y:randomIntFromRange(circle.row*side_len + circle.radius, (circle.row+1)*side_len - circle.radius),
+    x:randomIntFromRange(circle.col*side_len + circle.radius, (circle.col+1)*side_len - circle.radius)
+  };
+  return loc;
+}
+
+// Get new destination for cicrle in diff city
+function get_new_dest(circle){
+  
+  //Dest should be different square 
+  rt= randomIntFromRange(0, 2)
+  ct = randomIntFromRange(0, 2)
+  while(circle.row==rt && circle.col==ct){
+    rt= randomIntFromRange(0, 2)
+    ct = randomIntFromRange(0, 2)    
+  }
+  circle.row = rt
+  circle.col = ct
+  loc = square_loc(circle)
+  console.log("get new dest", circle.row, circle.col, loc)
+  
+  circle.destCircle.x = loc.x;
+  circle.destCircle.y = loc.y;
+}
+
+
+function go_to_box(circle){
+  destCircle = circle.destCircle
+
+  if(isCollision(circle, destCircle)){
+    // Get new destination
+    get_new_dest(circle)
+    circle.velocity.x = 0
+    circle.velocity.y = 0
+//    circle.central_div = 'from'    
+    console.log("reached dest circle") 
+  }
+  // Q1
+  else if(circle.x<destCircle.x && circle.y<destCircle.y){
+    circle.velocity.x = (Math.random()+0.1) * Speed
+    circle.velocity.y = (destCircle.y - circle.y)/(destCircle.x - circle.x)*circle.velocity.x      
+  }
+  // Q2
+  else if(circle.x>destCircle.x && circle.y<destCircle.y){
+    circle.velocity.x = -(Math.random()+0.1) * Speed
+    circle.velocity.y = (destCircle.y - circle.y)/(destCircle.x - circle.x)*circle.velocity.x      
+  }
+  // Q3
+  else if(circle.x>destCircle.x && circle.y>destCircle.y){
+    circle.velocity.x = -(Math.random()+0.1) * Speed
+    circle.velocity.y = (destCircle.y - circle.y)/(destCircle.x - circle.x)*circle.velocity.x      
+  }
+  // Q4
+  else if(circle.x<destCircle.x && circle.y>destCircle.y){
+    circle.velocity.x = (Math.random()+0.1) * Speed
+    circle.velocity.y = (destCircle.y - circle.y)/(destCircle.x - circle.x)*circle.velocity.x      
+  }
+
+}
+
+function move_in_box(circle){
+  row = circle.row
+  col = circle.col
+  // Right 
+ if(circle.x + circle.radius >= side_len*(col+1))
+   circle.velocity.x = -(Math.random()+0.1) * Speed;
+ // Left
+ if(circle.x - circle.radius <=side_len*(col))
+   circle.velocity.x = (Math.random()+0.1) * Speed;
+  // Bottom
+ if(circle.y + circle.radius >= side_len*(row+1))
+   circle.velocity.y = -(Math.random()+0.1) * Speed
+ // Top
+ if(circle.y - circle.radius <=side_len*(row))
+     circle.velocity.y = (Math.random()+0.1) * Speed 
+}
+
+
+// Creates circle with radius in row col square
+function form_circle(radius, row, col){
+  let tmp = new Circle()
+  // Square 0, 2
+  tmp.radius = radius
+  
+  // Intital Row and COl
+  tmp.row = row
+  tmp.col = col
+  console.log("set row col", tmp.row, tmp.col)
+
+  // Get location of tmp in its box
+  loc = square_loc(tmp)
+  tmp.x = loc.x
+  tmp.y = loc.y
+
+  tmp.color = 'yellow'
+
+  // Set the dest Circle
+  tmp.destCircle = new Circle()
+  tmp.destCircle.radius = tmp.radius;
+  
+  return tmp
+
+}
 
 // Objects
 class Circle {
@@ -140,6 +246,9 @@ class Circle {
     };
     // whether I am in the diversion or not
     this.central_div = 'boundry'
+    this.row = randomIntFromRange(0, 2)
+    this.col = randomIntFromRange(0, 2)
+    this.destCircle = new Object()
   }
   // Draw each circle
   draw() {
@@ -182,14 +291,22 @@ class Circle {
     }
     else if(this.central_div=='from')
       go_from_center(this)
-
-    
     
     console.log(this.central_div, this.x, this.y,  this.velocity.x,  this.velocity.y)
     this.x += this.velocity.x
     this.y += this.velocity.y
 
   }
+  
+  update_city(){
+    
+    this.draw()
+    boundary_bounce(this)
+
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+  }
+    
 }
 
 let particles, Radius, Speed, N, initial_infect, infection_prob, total, infected, recovered, dead;

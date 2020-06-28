@@ -103,78 +103,59 @@ function after_collision(c1, c2){
   }
 }
 
+
+
+function draw_grid(){
+  cc.beginPath();
+  cc.moveTo(side_len, 0);
+  cc.lineTo(side_len, canvas_sim.height);
+
+  cc.moveTo(2*side_len, 0);
+  cc.lineTo(2*side_len, canvas_sim.height);
+
+  cc.moveTo(0, 2*side_len);
+  cc.lineTo(canvas_sim.height, 2*side_len);
+
+  cc.moveTo(0, side_len);
+  cc.lineTo(canvas_sim.height, side_len);
+
+  cc.stroke();
+
+}
+
 // Animation Loop
 var temp = 1;
 
+//Trial Start Here
 function animate_3() {
 
-    requestAnimationFrame(animate_3);
-    cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
+  requestAnimationFrame(animate_3);
+  cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
 
-    ball.draw();
-
-    // ball.update()
-    // if(ball.central_div==true)
-    //   go_to_center(ball)
-    // else
-    
-    console.log(ball.central_div, ball.x, ball.y,  ball.velocity.x,  ball.velocity.y)
-    ball.draw();
-    if (ball.central_div=="boundry" && Math.random()<0.01) //center diversion
-      ball.central_div = 'to'
-
-    if(ball.central_div=='boundry'){
-      ball.color = 'yellow'
-      boundary_bounce(ball)
-    }
-    else if(ball.central_div=='to'){
-      ball.color = 'red'
-      go_to_center(ball)
-    }
-    else if(ball.central_div=='from')
-      go_from_center(ball)
-
-    
-    
-    console.log(ball.central_div, ball.x, ball.y,  ball.velocity.x,  ball.velocity.y)
-    ball.x += ball.velocity.x
-    ball.y += ball.velocity.y
-}
-
-Speed = 3
-  let ball = new Circle()
-    console.log(ball.central_div, ball.x, ball.y,  ball.velocity.x,  ball.velocity.y)
-
-  ball.x = 50
-  ball.y = 250
-  ball.radius = 5
-  ball.color = 'yellow'
-  // ball.velocity.x= 2
-  // ball.velocity.y=2
+  // Draw the square boundry
+  draw_grid()
   ball.draw()
-
-  Speed = 5
-
-  var row = 3, col = 3
-  // Center Square
-  for(var i=0;i<row;i++){
-    for(var j=0;j<col;j++){
-      cc.beginPath();
-      side_len = canvas_sim.height/3
-      cc.rect(i*side_len, j*side_len, side_len, side_len);
-      cc.stroke();
-    }
-  }
   
+//  get_new_dest(ball)
+  go_to_box(ball)
+//  move_in_box(ball)
 
-function populate_box(){
-  
+//    console.log(ball)
+  ball.x += ball.velocity.x
+  ball.y += ball.velocity.y
 }
 
+Speed = 2
+side_len = canvas_sim.height/3
 
-// animate_3()
-// init()
-// animate_2()
+let ball = form_circle(radius=2, randomIntFromRange(0, 2), randomIntFromRange(0, 2))
 
+ball.draw()
 
+console.log(ball, ball.row, ball.col)
+draw_grid()
 
+get_new_dest(ball)
+console.log(ball)
+
+animate_3()

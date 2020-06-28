@@ -24,16 +24,6 @@ function slide_val(name){
 
 function init() {
   
-
-// Center Square
-  cc.beginPath();
-  side_len = 35
-  cc.rect((canvas_sim.width - side_len)/2, 
-    (canvas_sim.height-side_len)/2, side_len, side_len);
-  cc.stroke();
-
-// 
-
   set_param(parseInt(slide_val(sldPar[0])),parseInt(slide_val(sldPar[1])),
     parseInt(slide_val(sldPar[2])), parseFloat(slide_val(sldPar[3])),
     parseFloat(slide_val(sldPar[4])))
@@ -46,11 +36,12 @@ function init() {
 
   particles = [];
 
+  side_len = canvas_sim.height/3
   // Create N Circles
   for(let i=0;i<N;i++){
 
     let tmpCircle = new Circle();
-
+    tmpCircle.form_circle(radius=Radius, randomIntFromRange(0, 2), randomIntFromRange(0, 2))
     // Avoid all black
     if(i==N-1 && infected==0){
       console.log('all black')
@@ -126,36 +117,66 @@ function draw_grid(){
 // Animation Loop
 var temp = 1;
 
-//Trial Start Here
-function animate_3() {
+function animate_2() {
 
-  requestAnimationFrame(animate_3);
-  cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
+  // Run until everyone is infected 
+  if(infected==N){
+    doAnim = false;
+    document.getElementById('playPause').innerText = "Finish";
+  }
+  if(infected!=N && doAnim){
+    // console.log(infected);
+    if(doAnim){
+      requestAnimationFrame(animate_2);
+    // middle
+      cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
+      
+      draw_grid()
+      particles.forEach(particle => {
 
-  // Draw the square boundry
-  draw_grid()
-  ball.draw()
-  
-//  get_new_dest(ball)
-  go_to_box(ball)
-//  move_in_box(ball)
+        // Check with every other circle for collision
+        for(var i = 0; i<particles.length;i++){
 
-//    console.log(ball)
-  ball.x += ball.velocity.x
-  ball.y += ball.velocity.y
+          if(particle == particles[i]){
+            continue;
+          } else{
+
+            if(isCollision(particle, particles[i]))
+              after_collision(particle, particles[i]);
+          }
+        }
+        // particle.update();
+        particle.update_city();
+      })
+    }
+  }
 }
 
-Speed = 2
-side_len = canvas_sim.height/3
+init()
+animate_2()
 
-let ball = form_circle(radius=2, randomIntFromRange(0, 2), randomIntFromRange(0, 2))
 
-ball.draw()
-
-console.log(ball, ball.row, ball.col)
-draw_grid()
-
-get_new_dest(ball)
-console.log(ball)
-
-animate_3()
+////Trial Start Here
+//function animate_3() {
+//
+//  requestAnimationFrame(animate_3);
+//  cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
+//
+//  // Draw the square boundry
+//  draw_grid()
+//  ball.update_city()
+//  ball.x += ball.velocity.x
+//  ball.y += ball.velocity.y
+//}
+//
+//Speed = 2
+//side_len = canvas_sim.height/3
+//
+//let ball = new Circle()
+//ball.form_circle(radius=2, randomIntFromRange(0, 2), randomIntFromRange(0, 2))
+//
+//console.log(ball, ball.row, ball.col)
+//
+////get_new_dest(ball)
+//
+//animate_3()

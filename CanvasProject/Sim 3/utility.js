@@ -147,14 +147,21 @@ function get_new_dest(circle){
 
 function go_to_box(circle){
   destCircle = circle.destCircle
-
+  //Reached the box
   if(isCollision(circle, destCircle)){
-    // Get new destination
-    get_new_dest(circle)
-    circle.velocity.x = 0
-    circle.velocity.y = 0
-//    circle.central_div = 'from'    
-    console.log("reached dest circle") 
+     console.log("reached dest circle") 
+    // Change to move in box with prob 90%
+    if(Math.random()<0.9){
+      circle.central_div = "in_box"
+      console.log("Move in box")
+    }
+    else{
+      console.log("Same to box")
+      // Get new destination
+      get_new_dest(circle)
+      circle.velocity.x = 0
+      circle.velocity.y = 0
+    }
   }
   // Q1
   else if(circle.x<destCircle.x && circle.y<destCircle.y){
@@ -197,31 +204,7 @@ function move_in_box(circle){
 }
 
 
-// Creates circle with radius in row col square
-function form_circle(radius, row, col){
-  let tmp = new Circle()
-  // Square 0, 2
-  tmp.radius = radius
-  
-  // Intital Row and COl
-  tmp.row = row
-  tmp.col = col
-  console.log("set row col", tmp.row, tmp.col)
 
-  // Get location of tmp in its box
-  loc = square_loc(tmp)
-  tmp.x = loc.x
-  tmp.y = loc.y
-
-  tmp.color = 'yellow'
-
-  // Set the dest Circle
-  tmp.destCircle = new Circle()
-  tmp.destCircle.radius = tmp.radius;
-  
-  return tmp
-
-}
 
 // Objects
 class Circle {
@@ -245,11 +228,34 @@ class Circle {
       dot_circle: new Object()
     };
     // whether I am in the diversion or not
-    this.central_div = 'boundry'
+    this.central_div = 'in_box'
     this.row = randomIntFromRange(0, 2)
     this.col = randomIntFromRange(0, 2)
     this.destCircle = new Object()
   }
+  
+  // Creates circle with radius in row col square
+  form_circle(radius, row, col){
+    // Square 0, 2
+    this.radius = radius
+
+    // Intital Row and COl
+    this.row = row
+    this.col = col
+    console.log("set row col", this.row, this.col)
+
+    // Get location of this in its box
+    loc = square_loc(this)
+    this.x = loc.x
+    this.y = loc.y
+
+//    this.color = 'yellow'
+
+    // Set the dest Circle
+    this.destCircle = new Circle()
+    this.destCircle.radius = this.radius;
+  }
+
   // Draw each circle
   draw() {
     cc.beginPath()
@@ -301,7 +307,29 @@ class Circle {
   update_city(){
     
     this.draw()
-    boundary_bounce(this)
+    
+    if(this.central_div=="in_box"){
+      if(Math.random()<0.01){ //prob of going to other box 1%
+        this.central_div = 'to_box'
+        get_new_dest(this)
+        console.log("Changed to box")
+      }
+      else
+        console.log("Same in box")
+    }
+
+    
+    if(this.central_div=="in_box"){
+//      Speed = 3
+//      this.color = 'blue'
+      move_in_box(this)
+    }
+    else if(this.central_div=="to_box"){
+//      Speed = 3
+//      this.color = 'red'
+      go_to_box(this)
+    }
+//    boundary_bounce(this)
 
     this.x += this.velocity.x;
     this.y += this.velocity.y;

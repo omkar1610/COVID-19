@@ -25,7 +25,7 @@ function slide_val(name){
 function init() {
   
   set_param(parseInt(slide_val(sldPar[0])),parseInt(slide_val(sldPar[1])),
-    parseInt(slide_val(sldPar[2])), parseFloat(slide_val(sldPar[3])),
+    parseInt(slide_val(sldPar[2])), parseInt(slide_val(sldPar[3])),
     parseFloat(slide_val(sldPar[4])))
   // set_param(5, 2, 30, 0.05, 0.01);
 
@@ -34,45 +34,61 @@ function init() {
   recovered = 0
   dead = 0
 
-  particles = [];
+  particles_grid = [];
 
   side_len = canvas_sim.height/3
   // Create N Circles
-  for(var i=0;i<N;i++){
+  for(var qq=0;qq<3;qq++){
+    for(var pp=0;pp<3;pp++){
+      particles = []
+      for(var i=0;i<N;i++){
 
-    let tmpCircle = new Circle();
-    tmpCircle.form_circle(radius=Radius, randomIntFromRange(0, 2), randomIntFromRange(0, 2))
-    // Avoid all black
-    if(i==N-1 && infected==0){
-      console.log('all black')
-      tmpCircle.color = 'red';
-      infected++;
-    }
-    tmpCircle.id = i;
-    tmpCircle.colArray = new Array(N).fill(0);
-
-
-
-    if(i!= 0){
-      for(let j = 0;j<particles.length; j++){
+      let tmpCircle = new Circle();
+      tmpCircle.form_circle(radius=Radius, qq, pp)
         
-        //Get new center till collision resolved
-        if(isCollision(tmpCircle, particles[j])){
-          tmpCircle.x = randomIntFromRange(tmpCircle.radius, canvas_sim.width-tmpCircle.radius); 
-          tmpCircle.y = randomIntFromRange(tmpCircle.radius, canvas_sim.height-tmpCircle.radius);
-          j = -1;
+      // Make all black
+      tmpCircle.color = 'black'
+        
+      tmpCircle.id = i;
+      tmpCircle.colArray = new Array(N).fill(0);
+
+
+
+      if(i!= 0){
+        for(let j = 0;j<particles.length; j++){
+
+          //Get new center till collision resolved
+          if(isCollision(tmpCircle, particles[j])){
+            loc = square_loc(tmpCircle)
+            tmpCircle.x = loc.x; 
+            tmpCircle.y = loc.y;
+            j = -1;
+          }
         }
       }
+
+      particles.push(tmpCircle);
+      // tmpCircle.draw()
+
+      }
+      particles_grid.push(particles)
     }
-
-    particles.push(tmpCircle);
-    // tmpCircle.draw()
-
   }
+  
+  //Choose initial infect no of sqaures and make 
+  var com1 = randomIntFromRange(0, 9)
+  particles = particles_grid[com1]
+  var tmp = 0
+  for(var i=0;i<N;i++){
+    if(Math.random()<0.05){
+      particles[i].color = 'red'
+      tmp++;
+    }
+  }
+  // All black
+  if(tmp==0)
+    particles[randomIntFromRange(0,N-1)].color = 'red'
 
-  // doAnim = true;
-  // Plot the graph
-  // Plotly.newPlot('d2', data, layout);
 }
 
 
@@ -115,9 +131,12 @@ function draw_grid(){
 
 // Animation Loop
 var temp = 1;
+var startTime = new Date();
+var currTime = new Date();
+
 
 function animate_2() {
-
+  
   // Run until everyone is infected 
   if(infected==N){
     doAnim = false;
@@ -127,55 +146,83 @@ function animate_2() {
     // console.log(infected);
     if(doAnim){
       requestAnimationFrame(animate_2);
+      currTime = new Date();
+
+      if((currTime-startTime)/1000 > 1){
+        console.log("1 Sec Passed")
+        startTime = currTime
+      }
     // middle
       cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
       
       draw_grid()
-      particles.forEach(particle => {
+      particles_grid.forEach(particles =>{
+        particles.forEach(particle => {
 
-        // Check with every other circle for collision
-        for(var i = 0; i<particles.length;i++){
+          // Check with every other circle for collision in same box
+          for(var i = 0; i<particles.length;i++){
 
-          if(particle == particles[i]){
-            continue;
-          } else{
+            otherPart = particles[i]
+            if(particle == otherPart){
+              continue;
+            } 
+            else if(particle.row==otherPart.row && particle.col==otherPart.col){
 
-            if(isCollision(particle, particles[i]))
-              after_collision(particle, particles[i]);
+              if(isCollision(particle, otherPart))
+                after_collision(particle, otherPart);
+            }
           }
-        }
-        // particle.update();
-        particle.update_city();
+          // particle.update();
+          particle.update_city();
+        })
       })
+      
     }
   }
 }
 
 init()
 animate_2()
-
-
-////Trial Start Here
-//function animate_3() {
 //
-//  requestAnimationFrame(animate_3);
-//  cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
 //
-//  // Draw the square boundry
-//  draw_grid()
-//  ball.update_city()
-//  ball.x += ball.velocity.x
-//  ball.y += ball.velocity.y
-//}
 //
-//Speed = 2
+//set_param(parseInt(slide_val(sldPar[0])),parseInt(slide_val(sldPar[1])),
+//    parseInt(slide_val(sldPar[2])), parseFloat(slide_val(sldPar[3])),
+//    parseFloat(slide_val(sldPar[4])))
+//
+//total = 0;infected = 0;recovered = 0;dead = 0;
+//particles = [];
+//
 //side_len = canvas_sim.height/3
+//draw_grid() 
+//// 30 per square 00
+//for(var i=0;i<30;i++){
 //
-//let ball = new Circle()
-//ball.form_circle(radius=2, randomIntFromRange(0, 2), randomIntFromRange(0, 2))
+//  let tmpCircle = new Circle();
+//  tmpCircle.form_circle(radius=Radius, 0, 0)
+//  // Avoid all black
+////  if(i==N-1 && infected==0){
+////    console.log('all black')
+////    tmpCircle.color = 'red';
+////    infected++;
+////  }
+//  tmpCircle.id = i;
+//  tmpCircle.colArray = new Array(N).fill(0);
 //
-//console.log(ball, ball.row, ball.col)
+//  if(i!= 0){
+//    for(let j = 0;j<particles.length; j++){
 //
-////get_new_dest(ball)
+//      //Get new center till collision resolved
+//      if(isCollision(tmpCircle, particles[j])){
+//        loc = square_loc(tmpCircle)
+//        tmpCircle.x = loc.x; 
+//        tmpCircle.y = loc.y;
+//        j = -1;
+//      }
+//    }
+//  }
 //
-//animate_3()
+//  particles.push(tmpCircle);
+//  tmpCircle.draw()
+//
+//}

@@ -138,7 +138,7 @@ function get_new_dest(circle){
   circle.row = rt
   circle.col = ct
   loc = square_loc(circle)
-  console.log("get new dest", circle.row, circle.col, loc)
+//  console.log("get new dest", circle.row, circle.col, loc)
   
   circle.destCircle.x = loc.x;
   circle.destCircle.y = loc.y;
@@ -153,10 +153,10 @@ function go_to_box(circle){
     // Change to move in box with prob 90%
     if(Math.random()<1){
       circle.central_div = "in_box"
-      console.log("Move in box")
+//      console.log("Move in box")
     }
     else{
-      console.log("Same to box")
+//      console.log("Same to box")
       // Get new destination
       get_new_dest(circle)
       circle.velocity.x = 0
@@ -221,13 +221,7 @@ class Circle {
 
     this.color = randomColor()
     this.collision = 0;
-    // old data helps to get back in track when come back from central loc
-    this.old = {
-      flag: false,
-      vel_x: 0,
-      vel_y: 0,
-      dot_circle: new Object()
-    };
+    
     // whether I am in the diversion or not
     this.central_div = 'in_box'
     this.row = randomIntFromRange(0, 2)
@@ -243,7 +237,7 @@ class Circle {
     // Intital Row and COl
     this.row = row
     this.col = col
-    console.log("set row col", this.row, this.col)
+//    console.log("set row col", this.row, this.col)
 
     // Get location of this in its box
     loc = square_loc(this)
@@ -313,20 +307,20 @@ class Circle {
       if(Math.random()<0){ //prob of going to other box 1%
         this.central_div = 'to_box'
         get_new_dest(this)
-        console.log("Changed to box")
+//        console.log("Changed to box")
       }
-      else
-        console.log("Same in box")
+//      else
+//        console.log("Same in box")
     }
 
     
     if(this.central_div=="in_box"){
-//      Speed = 3
+      Speed = parseInt(slide_val(sldPar[1]))
 //      this.color = 'blue'
       move_in_box(this)
     }
     else if(this.central_div=="to_box"){
-//      Speed = 3
+      Speed = 3
 //      this.color = 'red'
       go_to_box(this)
     }

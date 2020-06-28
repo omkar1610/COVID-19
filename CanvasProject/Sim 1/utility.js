@@ -50,6 +50,10 @@ class Circle {
 
     this.color = randomColor()
     this.collision = 0;
+    if(this.color=='red')
+      this.infect_time = new Date()
+    else
+      this.infect_time = 0;
   }
   // Draw each circle
   draw() {
@@ -77,7 +81,9 @@ class Circle {
 
 let particles, Radius, Speed, N, initial_infect, infection_prob, total, infected, recovered, dead;
 var doAnim = false;
-
+var startTime;
+var day = 1// 1 sec = 1day
+var daysPassed, black, red, green
 
 function set_param(rad, speed, n, init_inf, inf_prob) {
   Radius = rad;

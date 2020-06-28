@@ -31,6 +31,9 @@ function init() {
 	infected = 0
 	recovered = 0
 	dead = 0
+    startTime = new Date()
+    daysPassed = 0
+    black = 0; red = 0; green = 0
 
 	particles = [];
 
@@ -43,6 +46,7 @@ function init() {
     if(i==N-1 && infected==0){
       console.log('all black')
       tmpCircle.color = 'red';
+      tmpCircle.infect_time = new Date()
       infected++;
     }
 
@@ -77,12 +81,16 @@ function after_collision(c1, c2){
   if(c1.color == 'black' && c2.color == 'red'){
     if(Math.random()<infection_prob){
       infected++; total--;
+      if(c1.color!='red')
+        c1.infect_time = new Date()
       c1.color = 'red';
     }
 
   } else  if(c1.color == 'red' && c2.color == 'black'){
     if(Math.random()<infection_prob){
       infected++; total--;
+      if(c2.color!='red')
+        c2.infect_time = new Date()
       c2.color = 'red';
     }
   }
@@ -92,7 +100,7 @@ function after_collision(c1, c2){
 var temp = 1;
 
 function animate_2() {
-
+infected = 0
 // Run until everyone is infected 
   if(infected==N){
     doAnim = false;
@@ -103,13 +111,21 @@ function animate_2() {
     // if(doAnim){
 
     requestAnimationFrame(animate_2);
-
     cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
+      black = 0; red=0; green=0;
 
     // The graph updation
     
+    
+    
     particles.forEach(particle => {
-
+      
+      //Start Recovering after 2 days of start
+      if(daysPassed>2){
+        if(particle.color=='red' && (new Date() - particle.infect_time)/1000 > 3){
+          particle.color = 'green'
+        }
+      }
       // Check with every other circle for collision
       for(var i = 0; i<particles.length;i++){
 
@@ -121,14 +137,28 @@ function animate_2() {
             after_collision(particle, particles[i]);
         }
       }
+      if(particle.color == 'black')
+        black++
+      if(particle.color=='green')
+        green++
+      if(particle.color=='red')
+        red++
       particle.update();
     })
+        // Calculate day
+
+    if((new Date()-startTime)/1000>day){
+      daysPassed++;
+      console.log(daysPassed, black, red, green)
+      startTime = new Date()
+    }
   }
 
 }
 
 init()
-// animate_2()
+doAnim=true
+ animate_2()
 
 
 

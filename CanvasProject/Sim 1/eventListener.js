@@ -40,6 +40,7 @@ document.getElementById('reset').addEventListener('click', function(){
     doAnim = true;
     init();
     animate_2();
+     
   }
   else
     init();

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Canvas Resize</title>
+  <title>Canvas</title>
 
   <style>
     canvas {
@@ -12,11 +12,13 @@
     	/*margin: 0;*/
     }
   </style>
-  <script src = "https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js">
-  </script>
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
   <script src = "https://cdn.plot.ly/plotly-latest.min.js">
   </script>
+  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <script src="chart.js"></script>
+
 
 </head>
 
@@ -51,35 +53,29 @@
 
     <button id="playPause">Start</button>
     <button id="reset">Reset</button>
+    <button id="addDataPoint">Add Data Point</button>  
 
   </div>
 
 
+
+  <div id="chartContainer" style="height: 200px; width: 350px;">
+  </div>
   <!-- Simulation First-->
 
   <div id='d1' style="position:absolute; z-index:1">  
     <canvas id = 'simulation'></canvas>
   </div>
-
-  <div id='d2' style="position:absolute; top:0px; left:0px; z-index:1">  
-  </div>
-
-
-  <!-- <div class="box" style="position:relative; top:350px">
-    <h1>Simulation2</h1>
-  </div> -->
-
-  <!-- <div id='d3' style="position:absolute; z-index:1">  
-    <canvas id = 'center'></canvas>
-  </div> -->
+  
 
   <head>
+<!--    <script src="chart.js"></script>-->
     <script src="utility.js"></script>
     <script src="random_move_simulation.js"></script>
     <script src="eventListener.js"></script>
-    <script src="chart.js"></script>
     <script src="slider_data.js"></script>
 <!--    <script src="center_loc_simulation.js"></script>-->
   </head>
+  
 </body>
 </html>

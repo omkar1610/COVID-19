@@ -1,7 +1,5 @@
 // Param Sliders
 
-
-
 for(let i=0;i<sldPar.length;i++){
 
   document.getElementById(sldPar[i]).oninput = function() {

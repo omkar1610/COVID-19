@@ -23,6 +23,27 @@ function isCollision(c1, c2){
   return 0;
 }
 
+// Change of color after collision
+function after_collision(c1, c2){
+
+  if(c1.color == 'black' && c2.color == 'red'){
+    if(Math.random()<infection_prob){
+      infected++; total--;
+      if(c1.color!='red')
+        c1.infect_time = new Date()
+      c1.color = 'red';
+    }
+
+  } else  if(c1.color == 'red' && c2.color == 'black'){
+    if(Math.random()<infection_prob){
+      infected++; total--;
+      if(c2.color!='red')
+        c2.infect_time = new Date()
+      c2.color = 'red';
+    }
+  }
+}
+
 // give new Speed on bounce
 function boundary_bounce(circle){
  if(circle.x + circle.radius >= canvas_sim.width)

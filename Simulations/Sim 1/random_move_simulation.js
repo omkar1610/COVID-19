@@ -16,28 +16,31 @@ var cc = canvas_sim.getContext('2d');
  
 // Implementation
 
-function slide_val(name){
-  return (document.getElementById(name).value)
+function slide_val(no, ivf){
+  if(ivf=='i')
+    return parseInt(document.getElementById(sldPar[no]).value)
+  else
+    return parseFloat(document.getElementById(sldPar[no]).value)
 }
 
 function init() {
-  set_param(parseInt(slide_val(sldPar[0])),parseInt(slide_val(sldPar[1])),
-    parseInt(slide_val(sldPar[2])), parseFloat(slide_val(sldPar[3])),
-    parseFloat(slide_val(sldPar[4])), parseFloat(slide_val(sldPar[5])),
-    parseInt(slide_val(sldPar[6])), parseInt(slide_val(sldPar[7])))
-  // set_param(15, 5, 10, 0.05, 0.1);
+  set_param(slide_val(0, "i"), slide_val(1, "i"),
+            slide_val(2, "i"), slide_val(3, "f"),
+            slide_val(4, "f"), slide_val(5, "f"),
+            slide_val(6, "i"), slide_val(7, "i"))
 
 	total = 0
 	infected = 0
 	recovered = 0
 	dead = 0
+  
     startTime = new Date()
     daysPassed = 0
     black = 0; red = 0; green = 0
 
 	particles = [];
 
-  // Create N Circles
+    // Create N Circles
 	for(let i=0;i<N;i++){
 
   	let tmpCircle = new Circle();
@@ -69,64 +72,32 @@ function init() {
 
 	}
   updateChart()
-  // doAnim = true;
-  // Plot the graph
-  // Plotly.newPlot('d2', data, layout);
 }
-
-
-// Change of color after collision
-function after_collision(c1, c2){
-
-  if(c1.color == 'black' && c2.color == 'red'){
-    if(Math.random()<infection_prob){
-      infected++; total--;
-      if(c1.color!='red')
-        c1.infect_time = new Date()
-      c1.color = 'red';
-    }
-
-  } else  if(c1.color == 'red' && c2.color == 'black'){
-    if(Math.random()<infection_prob){
-      infected++; total--;
-      if(c2.color!='red')
-        c2.infect_time = new Date()
-      c2.color = 'red';
-    }
-  }
-}
-
-// Animation Loop
 
 
 function animate_2() {
-infected = 0
-// Run until everyone is infected 
-  if(infected==N){
-    doAnim = false;
-    document.getElementById('playPause').innerText = "Finish";
-  }
+  infected = 0
+  
   if(doAnim){
-    // Each sec is day days
-    if((new Date()-startTime)/1000>1/day){
-      daysPassed++;
-      // console.log(daysPassed, black, red, green)
-      startTime = new Date()
-      updateChart()
-    }
-    // console.log(infected);
-    // if(doAnim){
+    
 
     requestAnimationFrame(animate_2);
     cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
     
+    // Each sec is day days
+    if((new Date()-startTime)/1000>1/day){
+      daysPassed++;
+      startTime = new Date()
+      updateChart()
+    }
+
     black = 0; red=0; green=0;
     // For each Paticle
     particles.forEach(particle => {
       
       //Start Recovering after 2 days of start
-      if(daysPassed>day){
-        if(particle.color=='red' && (new Date() - particle.infect_time)/1000 > days_for_recovery){
+      if(daysPassed>revory_start_day){
+        if(particle.color=='red' && (new Date() - particle.infect_time)/1000 > days_for_recovery/day){
           particle.color = 'green'
         }
       }
@@ -141,6 +112,7 @@ infected = 0
             after_collision(particle, particles[i]);
         }
       }
+      
       if(particle.color == 'black')
         black++
       if(particle.color=='green')
@@ -153,10 +125,8 @@ infected = 0
     if(green!=0 && red==0){
       pause()
       console.log("Pause", green, red)
-    }
-    
+    }    
   }
-
 }
 
 init()

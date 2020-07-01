@@ -2,7 +2,7 @@
 function get_chart(){
   return new CanvasJS.Chart("chartContainer", {
     title:{
-      text: "Some Title"
+      text: "Just the Title"
     },
     theme: "light2", // "light1", "light2", "dark1", "dark2"
     animationEnabled: true,

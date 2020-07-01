@@ -16,7 +16,7 @@ var cc = canvas_sim.getContext('2d');
  
 // Implementation
 
-function slide_val(no, ivf){
+function param(no, ivf){
   if(ivf=='i')
     return parseInt(document.getElementById(sldPar[no]).value)
   else
@@ -24,10 +24,10 @@ function slide_val(no, ivf){
 }
 
 function init() {
-  set_param(slide_val(0, "i"), slide_val(1, "i"),
-            slide_val(2, "i"), slide_val(3, "f"),
-            slide_val(4, "f"), slide_val(5, "f"),
-            slide_val(6, "i"), slide_val(7, "i"))
+  set_param(param(0, "i"), param(1, "i"),
+            param(2, "i"), param(3, "f"),
+            param(4, "f"), param(5, "f"),
+            param(6, "i"), param(7, "i"))
 
 	total = 0
 	infected = 0
@@ -119,6 +119,7 @@ function animate_2() {
         green++
       if(particle.color=='red')
         red++
+      
       particle.update();
     })
 

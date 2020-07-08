@@ -17,50 +17,24 @@ function randomColor() {
 }
 
 // If two circles collide or not |c1-c2|<=r1+r2
-// Instead of radius it should check for infection radius
 function isCollision(c1, c2){
-  if(c1.isInfecting || c2.isInfecting)
-    if((c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y) <= (c1.radius + c2.radius)*(c1.radius + c2.radius))
-      return 1;
-  return 0;
-}
-
-function isCollision_sim_2(c1, c2){
   if((c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y) <= (c1.radius + c2.radius)*(c1.radius + c2.radius))
     return 1;
   return 0;
 }
 
-// Change of color after collision
-function after_collision(c1, c2){
-
-  if(c1.color == 'black' && c2.color == 'red' ){
-    if(Math.random()<infection_prob){
-      infected++; total--;
-      if(c1.color!='red')
-        c1.infect_time = new Date()
-      c1.color = 'red';
-    }
-
-  } else  if(c1.color == 'red' && c2.color == 'black' ){
-    if(Math.random()<infection_prob){
-      infected++; total--;
-      if(c2.color!='red')
-        c2.infect_time = new Date()
-      c2.color = 'red';
-    }
-  }
-}
-
 // give new Speed on bounce
 function boundary_bounce(circle){
+  // Right 
  if(circle.x + circle.radius >= canvas_sim.width)
    circle.velocity.x = -(Math.random()+0.1) * Speed;
+ // Left
  if(circle.x - circle.radius <=0)
    circle.velocity.x = (Math.random()+0.1) * Speed;
-
+  // Bottom
  if(circle.y + circle.radius >= canvas_sim.height)
    circle.velocity.y = -(Math.random()+0.1) * Speed
+ // Top
  if(circle.y - circle.radius <=0)
      circle.velocity.y = (Math.random()+0.1) * Speed 
 }
@@ -79,7 +53,7 @@ function go_to_center(circle) {
     circle.old.dot_circle.radius = 0.1
   }
 
-  if(isCollision_sim_2(circle, dot_circle)){
+  if(isCollision(circle, dot_circle)){
     circle.velocity.x = 0
     circle.velocity.y = 0
     circle.central_div = 'from'    
@@ -112,7 +86,7 @@ function go_to_center(circle) {
 // give new speed for going out from center
 function go_from_center(circle) {
   // restore old data once reach the previous position
-  if(isCollision_sim_2(circle, circle.old.dot_circle)){
+  if(isCollision(circle, circle.old.dot_circle)){
     circle.old.flag = false
     circle.velocity.x = circle.old.vel_x
     circle.velocity.y = circle.old.vel_y
@@ -144,6 +118,60 @@ function go_from_center(circle) {
 }
 
 
+function to_and_from_center(circle){
+//  cent_x = canvas_sim.width/2
+//  cent_y = canvas_sim.height/2
+  //Starting, Go to mid
+  if(circle.old.step==0){
+    console.log("activated new")
+    circle.old.vel_x = circle.velocity.x
+    circle.old.vel_y = circle.velocity.y
+    circle.old.x = circle.x
+    circle.old.y = circle.y
+    //Middle Location
+    mid_x = (circle.old.x+canvas_sim.width/2)/2
+    mid_y = (circle.old.y+canvas_sim.height/2)/2
+    circle.velocity.x = 0
+    circle.velocity.y = 0
+//    circle.velocity.x = mid.x - circle.x
+//    circle.velocity.y = mid.y - circle.y
+    circle.old.step++
+  }
+  // Go to center
+  else if(circle.old.step==1){
+    circle.velocity.x = canvas_sim.width/2 - circle.x
+    circle.velocity.y = canvas_sim.height/2 - circle.y
+    circle.old.step++
+  }
+  //Stay at center
+  else if(circle.old.step==2){
+    circle.velocity.x = 0
+    circle.velocity.y = 0
+    circle.old.step++
+  }
+  // Go back to middle
+  else if(circle.old.step==3){
+    mid_x = (circle.old.x+canvas_sim.width/2)/2
+    mid_y = (circle.old.y+canvas_sim.height/2)/2
+    circle.velocity.x = mid_x - circle.x
+    circle.velocity.y = mid_y - circle.y
+    circle.old.step++
+  }
+  // Go back to old position
+  else if(circle.old.step==4){
+    circle.velocity.x = circle.old.x - circle.x
+    circle.velocity.y = circle.old.y - circle.y
+    circle.old.step++
+  }
+  // Go back on moving
+  else if(circle.old.step==5){
+    circle.velocity.x = circle.old.vel_x
+    circle.velocity.y = circle.old.vel_y
+    circle.old.step = 0
+    circle.central_div = 'boundry';
+  }
+}
+
 
 // Objects
 class Circle {
@@ -159,15 +187,12 @@ class Circle {
 
     this.color = randomColor()
     this.collision = 0;
-    if(this.color=='red')
-      this.infect_time = new Date()
-    else
-      this.infect_time = 0;
-    
-    this.isInfecting = false //Will infect a black only if is infecting = true
-    
+    // old data helps to get back in track when come back from central loc
     this.old = {
       flag: false,
+      step : 0,
+      x : 0,
+      y : 0,
       vel_x: 0,
       vel_y: 0,
       dot_circle: new Object()
@@ -179,16 +204,12 @@ class Circle {
   draw() {
     cc.beginPath()
     cc.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
-
-    // Dont fill if red and not infecting
-    if(this.color!='red' || this.isInfecting!=true)
-      cc.fillStyle = this.color
-    else
-      cc.fillStyle = 'purple';
-    
+    cc.fillStyle = this.color
     cc.fill();
-    cc.strokeStyle = this.color;
+    // cc.strokeStyle = "blue";
     cc.stroke()
+    // cc.fillStyle = 'black'
+    // cc.fillText(this.id, this.x, this.y);
     cc.closePath()
   }
 
@@ -201,49 +222,50 @@ class Circle {
     this.x += this.velocity.x;
     this.y += this.velocity.y;
   }
-  
+
   update_center() {
     this.draw()
 
     if (this.central_div=="boundry" && Math.random()<0.004) //center diversion
       this.central_div = 'to'
 
-    if(this.central_div=='to'){
-      Speed = 3
-      // this.color = 'red'
-      go_to_center(this)
-    }
-    else if(this.central_div=='from'){
-      Speed = 3
-      go_from_center(this)
-    }
-//    if(this.central_div=='boundry'){
-    else{
+    if(this.central_div=='boundry'){
       Speed = 1
       // this.color = 'yellow'
       boundary_bounce(this)
     }
+    else if(this.central_div=='to'){
+      Speed = 6
+      // this.color = 'red'
+      go_to_center(this)
+    }
+    else if(this.central_div=='from'){
+      Speed = 6
+      go_from_center(this)
+    }
+    else if(this.central_div=='new_center'){
+      to_and_from_center(this)
+    }
 
+    
+    
+//    console.log(this.central_div, this.x, this.y,  this.velocity.x,  this.velocity.y)
     this.x += this.velocity.x
     this.y += this.velocity.y
 
   }
 }
 
+let particles, Radius, Speed, N, initial_infect, infection_prob, total, infected, recovered, dead;
+var doAnim = false;
 
-function set_param(rad, speed, n, init_inf, inf_prob, day_per_sec,
-      rec_start, rec_tim) {
+
+function set_param(rad, speed, n, init_inf, inf_prob) {
   Radius = rad;
   Speed = speed;
   N = n;
 
   initial_infect = init_inf; //These many already infected before simulation
   infection_prob = inf_prob; //This is probability a passing by human will get infected
-  day = day_per_sec
-  recovery_start_day = rec_start
-  days_for_recovery = rec_tim
-
 
 }
-
-

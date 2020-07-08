@@ -1,28 +1,78 @@
-var chart_div = document.getElementById('d2');
-var infect = {
-  x: [],  y: [],
-  mode: 'lines',  type: 'bar'
+
+function get_chart(){
+  return new CanvasJS.Chart("chartContainer", {
+    title:{
+      text: "Just the Title"
+    },
+    theme: "light2", // "light1", "light2", "dark1", "dark2"
+    animationEnabled: true,
+    // axisX: {
+    //   intervalType: "days"
+    // },
+    toolTip: {
+      shared: true
+    },
+    data: [
+      {        
+        type: "stackedArea100",
+        name: "Red",
+       // showInLegend: "true",
+        color: "red",
+        dataPoints: []
+      },
+      {        
+        type: "stackedArea100",
+        name: "Black",
+        color: "black",
+        // showInLegend: "true",
+        dataPoints: []
+      },
+      {        
+        type: "stackedArea100",
+        name: "Green",
+        color: "green",
+        // showInLegend: "true",
+        dataPoints: []
+      }
+    ]
+  })
+}
+
+chart = get_chart();
+// chart.render(); 
+var updateCount = 0;
+
+//Update Chart
+var updateChart = function () {
+
+  updateCount++;
+  
+  tmpData = get_data()
+  // console.log(updateCount, tmpData)
+
+  chart.options.data[0].dataPoints.push({y : tmpData.red})
+  chart.options.data[1].dataPoints.push({y : tmpData.black})
+  chart.options.data[2].dataPoints.push({y : tmpData.green})
+      
+  // chart.options.title.text = "Update " + updateCount;
+  chart.render();   
+};
+
+var resetChart = function () {
+  console.log("reset Graph")
+  chart = get_chart()
+  updateCount = 0
+  // chart.destroy()
+  chart.options.data[0].dataPoints = [];
+  chart.options.data[1].dataPoints = [];
+  chart.options.data[2].dataPoints = [];
+  // chart.render();        
 };
 
 
 
-var trace2 = {
-  x: [2, 3, 4, 5],  y: [16, 5, 11, 9],
-  mode: 'lines',  type: 'scatter'
-};
 
-var layout = {
-  title: 'Data',
-  xaxis: {
-    title: 'Time',showgrid: false,zeroline: false
-  },
-  yaxis: {
-    title: 'Number',showline: false
-  },
-  height: 600,
-  width: 600
-};
 
-var data = [infect];
+// update chart every second
 
-// Plotly.newPlot('d2', data, layout);
+// setInterval(function(){updateChart()}, 1000);

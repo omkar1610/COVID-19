@@ -143,14 +143,23 @@ function animate_2() {
     requestAnimationFrame(animate_2);
   // middle
     cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
-    mid_circle.draw()
+//    mid_circle.draw()
     // Center Square
     cc.beginPath();
-    side_len = 35
+    side_len = 20
     cc.rect((canvas_sim.width - side_len)/2, 
       (canvas_sim.height-side_len)/2, side_len, side_len);
     cc.stroke();
 
+      
+//    if(new Date()-startTime/1000>1){
+//      daysPassed++;
+//      for(var i = 0; i<N;i++)
+//        if(Math.random()<0.004)
+//          particles[i].central_div = 'to'
+////        else
+////          particles[i].central_div = 'boundry'
+//    }
     // The graph updation
   // 
     particles.forEach(particle => {
@@ -239,6 +248,6 @@ function animate_2() {
 // animate_3()
 init()
 animate_2()
-
-
+var startTime = new Date()
+daysPassed = 0
 

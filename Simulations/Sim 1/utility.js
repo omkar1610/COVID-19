@@ -17,16 +17,18 @@ function randomColor() {
 }
 
 // If two circles collide or not |c1-c2|<=r1+r2
+// Instead of radius it should check for infection radius
 function isCollision(c1, c2){
-  if((c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y) <= (c1.radius + c2.radius)*(c1.radius + c2.radius))
-    return 1;
+  if(c1.isInfecting || c2.isInfecting)
+    if((c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y) <= (c1.radius + c2.radius)*(c1.radius + c2.radius))
+      return 1;
   return 0;
 }
 
 // Change of color after collision
 function after_collision(c1, c2){
 
-  if(c1.color == 'black' && c2.color == 'red'){
+  if(c1.color == 'black' && c2.color == 'red' ){
     if(Math.random()<infection_prob){
       infected++; total--;
       if(c1.color!='red')
@@ -34,7 +36,7 @@ function after_collision(c1, c2){
       c1.color = 'red';
     }
 
-  } else  if(c1.color == 'red' && c2.color == 'black'){
+  } else  if(c1.color == 'red' && c2.color == 'black' ){
     if(Math.random()<infection_prob){
       infected++; total--;
       if(c2.color!='red')
@@ -57,6 +59,8 @@ function boundary_bounce(circle){
      circle.velocity.y = (Math.random()+0.1) * Speed 
 }
 
+
+
 // Objects
 class Circle {
   constructor() {
@@ -75,17 +79,23 @@ class Circle {
       this.infect_time = new Date()
     else
       this.infect_time = 0;
+    
+    this.isInfecting = false //Will infect a black only if is infecting = true
   }
   // Draw each circle
   draw() {
     cc.beginPath()
     cc.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
-    cc.fillStyle = this.color
+
+    // Dont fill if red and not infecting
+    if(this.color!='red' || this.isInfecting!=true)
+      cc.fillStyle = this.color
+    else
+      cc.fillStyle = 'purple';
+    
     cc.fill();
-    // cc.strokeStyle = "blue";
+    cc.strokeStyle = this.color;
     cc.stroke()
-    // cc.fillStyle = 'black'
-    // cc.fillText(this.id, this.x, this.y);
     cc.closePath()
   }
 

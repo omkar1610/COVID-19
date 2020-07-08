@@ -16,3 +16,6 @@ var days_for_recovery = 4 // Infected guy gets well or dead in 4 days
 
 
 var end_flag = false
+
+var infect_rad;
+var randArray;

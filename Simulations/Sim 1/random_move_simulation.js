@@ -24,7 +24,7 @@ function param(no, ivf){
 }
 
 function init() {
-  set_param(param(0, "i"), param(1, "i"),
+  set_param(param(0, "f"), param(1, "i"),
             param(2, "i"), param(3, "f"),
             param(4, "f"), param(5, "f"),
             param(6, "i"), param(7, "i"))
@@ -84,9 +84,19 @@ function animate_2() {
     requestAnimationFrame(animate_2);
     cc.clearRect(0, 0, canvas_sim.width, canvas_sim.height)
     
+    
+    // For each day every infected is spreading or not with prob
     // Each sec is day days
     if((new Date()-startTime)/1000>1/day){
       daysPassed++;
+
+      // Check if a red particle will infect today or not
+      for(var i = 0; i<N; i++) {
+        if(particles[i].color=='red' && Math.random()<infection_prob)
+          particles[i].isInfecting = true;
+        else
+          particles[i].isInfecting = false;
+      }
       startTime = new Date()
       updateChart()
     }
@@ -95,19 +105,16 @@ function animate_2() {
     // For each Paticle
     particles.forEach(particle => {
       
-      //Start Recovering after 2 days of start
-      if(daysPassed>revory_start_day){
-        if(particle.color=='red' && (new Date() - particle.infect_time)/1000 > days_for_recovery/day){
-          particle.color = 'green'
-        }
-      }
+      // For recovery
+      if(particle.color=='red' && (new Date() - particle.infect_time)/1000 > days_for_recovery/day)
+        particle.color = 'green'
+      
       // Check with every other circle for collision
       for(var i = 0; i<particles.length;i++){
 
-        if(particle == particles[i]){
+        if(particle == particles[i])
           continue;
-        } else{
-          
+        else{
           if(isCollision(particle, particles[i]))
             after_collision(particle, particles[i]);
         }

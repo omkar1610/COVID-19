@@ -59,6 +59,12 @@ india_df = pd.merge(india_df, d_num, on='dateannounced', how='outer',
          suffixes=('_r', '_d')).sort_values(by='dateannounced')
 india_df = pd.merge(india_df, icmr_test, on='dateannounced', how='outer').sort_values(by='dateannounced')
 
+india_df = india_df.replace(to_replace=float("Nan"), value=int(0))
+india_df['total_cases_h'] = india_df['numcases_h'].cumsum()
+india_df['total_cases_r'] = india_df['numcases_r'].cumsum()
+india_df['total_cases_d'] = india_df['numcases_d'].cumsum()
+india_df['Total Samples Tested'] = india_df['daily_test'].cumsum()
+india_df = india_df.astype(int)
 # ============================================================================================================================================
 # Saving India Numbers with testing 
 india_df.to_csv("serverData/india_till_date.csv")
@@ -142,11 +148,19 @@ def state_wise_file(state):
 
 # ============================================================================================================================================
 # Saving each State wise file with testing
+print("Saving Each State Numbers")
 for st in data.detectedstate.unique():
 #     tmp_df = state_wise_file(st)
     if st!="State Unassigned" and st!="":
-        state_wise_file(st).to_csv("serverData/statewise/"+str(st)+".csv")
-        print("Saved " + st , end = ", ")
+        tmp_df = state_wise_file(st);
+		# tmp_df = tmp_df.replace(to_replace=float("Nan"), value=0)
+  #       tmp_df['total_cases_h'] = tmp_df['numcases_h'].cumsum()
+  #       tmp_df['total_cases_r'] = tmp_df['numcases_r'].cumsum()
+  #       tmp_df['total_cases_d'] = tmp_df['numcases_d'].cumsum()
+  #       tmp_df = tmp_df.astype(int)
+        tmp_df.to_csv("serverData/statewise/"+str(st)+".csv")
+
+        print(st , end = ", ")
 print()
 # ============================================================================================================================================
 
@@ -175,9 +189,68 @@ def dist_data(h_dist, r_dist, d_dist, statecode, num_case='numcases'):
 
 # ============================================================================================================================================
 # Saving each State wise file with testing
+print("Saving States")
 for state in data.statecode.unique():
 	if state!="" and st!='State Unassigned':
-		dist_data(h_dist, r_dist, d_dist, state, 'numcases').to_csv("serverData/all_dist_till_date_statewise/"+str(state)+".csv")
-		print("Saved " + state , end = ", ")
+		tmp_df = dist_data(h_dist, r_dist, d_dist, state, 'numcases')
+# 		tmp_df = tmp_df.replace(to_replace=float("Nan"), value=int(0))
+#       tmp_df['total_cases_h'] = tmp_df['numcases_h'].cumsum()
+#       tmp_df['total_cases_r'] = tmp_df['numcases_r'].cumsum()
+#       tmp_df['total_cases_d'] = tmp_df['numcases_d'].cumsum()
+#       tmp_df = tmp_df.astype(int)
+		tmp_df.to_csv("serverData/all_dist_till_date_statewise/"+str(state)+".csv")
+		print(state , end = ", ")
 print()
+# ============================================================================================================================================
+
+
+# Distwise timeline perday
+
+h_dist = h_data.groupby(by=['detectedstate', 'detecteddistrict', 'dateannounced'])[['numcases']].sum()
+r_dist = r_data.groupby(by=['detectedstate', 'detecteddistrict', 'dateannounced'])[['numcases']].sum()
+d_dist = d_data.groupby(by=['detectedstate', 'detecteddistrict', 'dateannounced'])[['numcases']].sum()
+
+def dist_wise(data, state, district):
+    try:
+        p = data.loc[state, district]
+        dist_tl = p[['numcases']]
+        dist_tl['total_cases'] = dist_tl['numcases'].cumsum()
+        return dist_tl
+    except:
+        dist_tl = pd.DataFrame(columns=['numcases'], index=h_dist.loc[state, district].index)
+        dist_tl['numcases'] = [0] * dist_df.shape[0]
+        dist_tl['total_cases'] = dist_tl['numcases'].cumsum()
+        return dist_tl
+ 
+
+dt = list(zip(*h_data.groupby(by=['detectedstate', 'detecteddistrict'])[['numcases']].sum().index.unique()))[0]
+state_list = list(set(dt))
+
+for st in state_list:
+    if st!="" and st!="State Unassigned":
+        print("Saving for State ", st, end=": ")
+        dist_list = h_data.groupby(by=['detectedstate', 'detecteddistrict'])[['numcases']].sum().loc[st].index.unique()
+
+        for dist in dist_list:
+            if dist!="":
+				# print(st, dist)
+                dist_df = pd.merge(dist_wise(h_dist, st, dist), dist_wise(r_dist, st, dist), on='dateannounced', how='outer', 
+                                   suffixes=('_h', '')).sort_values(by='dateannounced')
+
+                dist_df = pd.merge(dist_df, dist_wise(d_dist, st, dist), on='dateannounced', how='outer', 
+                         suffixes=('_r', '_d')).sort_values(by='dateannounced')
+                dist_df = dist_df.replace(to_replace=float("Nan"), value=int(0))
+                dist_df['total_cases_h'] = dist_df['numcases_h'].cumsum()
+                dist_df['total_cases_r'] = dist_df['numcases_r'].cumsum()
+                dist_df['total_cases_d'] = dist_df['numcases_d'].cumsum()
+                # dist_df['Total Tested'] = dist_df['daily_test'].cumsum()
+                dist_df = dist_df.astype(int)
+				# print(dist_df.shape)
+
+# ============================================================================================================================================
+                # Saving each dist timeline
+                dist_df.to_csv("serverData/districtwise/"+st+"/"+dist+".csv")
+                print(dist, end=" ")
+print()
+
 # ============================================================================================================================================

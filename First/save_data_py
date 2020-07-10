@@ -1,0 +1,154 @@
+# Importing modules
+import pandas as pd
+import numpy as np
+import json
+from datetime import datetime
+import plotly.graph_objects as go
+import pickle
+
+# Load the database
+with open('data/data.pkl', 'rb') as f:
+    data = pickle.load(f)
+
+# ICMR Testing data
+def get_icmr_data():
+	icmr_test =pd.read_csv('https://api.covid19india.org/csv/latest/tested_numbers_icmr_data.csv')[['Tested As Of',
+	                                                                                'Total Samples Tested']]
+	icmr_test['Tested As Of'] = icmr_test['Tested As Of'].apply(str)
+	icmr_test.replace("nan", float("NaN"), inplace=True)
+	icmr_test = icmr_test.dropna(subset=['Tested As Of', 'Total Samples Tested'])
+	icmr_test['Tested As Of'] = icmr_test['Tested As Of'].apply(lambda x : datetime.strptime(x, "%d/%m/%Y"))
+	icmr_test = icmr_test.sort_values(by='Tested As Of')[['Tested As Of', 'Total Samples Tested']]
+	icmr_test.index = icmr_test['Tested As Of']
+	icmr_test.index.name = 'dateannounced'
+	del icmr_test['Tested As Of']
+	icmr_test['daily_test'] = icmr_test['Total Samples Tested'].diff().fillna(
+	                                            icmr_test['Total Samples Tested'])
+	return icmr_test
+
+icmr_test = get_icmr_data()
+
+# State Test
+def get_state_wise_test():
+	state_test = pd.read_csv('https://api.covid19india.org/csv/latest/statewise_tested_numbers_data.csv')
+	state_test['Updated On'] = state_test['Updated On'].apply(lambda x : datetime.strptime(x, "%d/%m/%Y"))
+	st_test = state_test.groupby(by=['State', 'Updated On']).sum()
+	# st_test.loc['Odisha'].sort_values(by='Updated On')[['Total Tested', 'Population NCP 2019 Projection']]
+	return st_test
+
+st_test = get_state_wise_test()
+
+
+h_data = data[data['currentstatus']=='Hospitalized']
+r_data = data[data['currentstatus']=='Recovered']
+d_data = data[data['currentstatus']=='Deceased']
+
+# Datewise number and cumsum
+def date_wise(df, group_by_col='dateannounced', num_case='numcases'):
+    h_num = df.groupby(by=group_by_col)[[num_case]].sum()
+    h_num['total_cases'] = h_num[num_case].cumsum()
+    return h_num
+
+h_num = date_wise(h_data)
+r_num = date_wise(r_data)
+d_num = date_wise(d_data)
+
+india_df = pd.merge(h_num, r_num, on='dateannounced', how='outer', 
+         suffixes=('_h', '')).sort_values(by='dateannounced')
+india_df = pd.merge(india_df, d_num, on='dateannounced', how='outer', 
+         suffixes=('_r', '_d')).sort_values(by='dateannounced')
+india_df = pd.merge(india_df, icmr_test, on='dateannounced', how='outer').sort_values(by='dateannounced')
+
+# ============================================================================================================================================
+# Saving India Numbers with testing 
+india_df.to_csv("serverData/india_till_date.csv")
+print("Saved India Data")
+# ============================================================================================================================================
+
+# State Data
+def add_active(full_data,  num_case='numcases'):
+    full_data = full_data.rename(columns={num_case:'Confirmed'})
+    full_data.replace(float("NaN"), 0, inplace=True)
+
+    full_data['Recovered'] = full_data['Recovered'].apply(int)
+    full_data['Deceased'] = full_data['Deceased'].apply(int)
+
+    full_data['Active'] = full_data['Confirmed'] - full_data['Recovered'] - full_data['Deceased']
+    return full_data
+
+def combine_data(group_by, num_case='numcases'):
+    full_data = h_data.groupby(by=group_by)[[num_case]].sum()
+    full_data['Recovered'] = r_data.groupby(by=group_by)[[num_case]].sum()
+    full_data['Deceased'] = d_data.groupby(by=group_by)[[num_case]].sum()
+
+    return add_active(full_data=full_data, num_case=num_case)
+
+state_data = combine_data(group_by='detectedstate')
+test = []
+# Add test data for each state
+for i in state_data.index:
+    try:
+        j = -1
+        k = 0
+        while k==0:
+            k = st_test.loc[i]['Total Tested'].tail(1-j).values[j]
+            j -= 1
+        test.append(int(k))
+    except:
+        test.append(0)
+state_data['total_test'] = test
+
+# ============================================================================================================================================
+# Saving All State Numbers with testing
+state_data.to_csv("serverData/all_state_till_date.csv")
+print("Saved All State Data")
+
+# ============================================================================================================================================
+
+
+# One file for each State timeline
+def state_wise_file(state):
+    # st_h = state_wise(h_data, state)
+    st_h = h_data.groupby(by=['detectedstate', 'dateannounced'])[['numcases']].sum().loc[state]
+    st_h['total_cases'] = st_h['numcases'].cumsum()
+    st_r = pd.DataFrame(index=st_h.index, columns=st_h.columns)
+    st_r.numcases = 0
+    
+    st_d = pd.DataFrame(index=st_h.index, columns=st_h.columns)
+    st_d.numcases = 0
+    try:
+        st_r = r_data.groupby(by=['detectedstate', 'dateannounced'])[['numcases']].sum().loc[state]
+    except:
+        print("st_r warning")
+    st_r['total_cases'] = st_r['numcases'].cumsum()
+    try:
+        st_d = d_data.groupby(by=['detectedstate', 'dateannounced'])[['numcases']].sum().loc[state]
+    except:
+        print("st_d warning")
+    st_d['total_cases'] = st_d['numcases'].cumsum()
+
+	#     Test
+    state_test = st_test.loc[state][['Total Tested']]
+    state_test['daily_test'] = state_test['Total Tested'].diff().fillna(
+                                            state_test['Total Tested']).apply(int)
+    state_test.index.name = 'dateannounced'
+
+    state_df = pd.merge(st_h, st_r, on='dateannounced', how='outer', 
+             suffixes=('_h', '')).sort_values(by='dateannounced')
+    state_df = pd.merge(state_df, st_d, on='dateannounced', how='outer', 
+             suffixes=('_r', '_d')).sort_values(by='dateannounced')
+    state_df = pd.merge(state_df, state_test, on='dateannounced', how='outer').sort_values(by='dateannounced')
+    return state_df
+
+# ============================================================================================================================================
+# Saving each State wise file with testing
+for st in data.detectedstate.unique():
+#     tmp_df = state_wise_file(st)
+    if st!="State Unassigned" and st!="":
+        state_wise_file(st).to_csv("serverData/statewise/"+str(st)+".csv")
+        print("Saved " + st + " Data")
+
+# ============================================================================================================================================
+
+
+

@@ -146,9 +146,38 @@ for st in data.detectedstate.unique():
 #     tmp_df = state_wise_file(st)
     if st!="State Unassigned" and st!="":
         state_wise_file(st).to_csv("serverData/statewise/"+str(st)+".csv")
-        print("Saved " + st + " Data")
-
+        print("Saved " + st , end = ", ")
+print()
 # ============================================================================================================================================
 
 
 
+# Statewise all dist timeline
+h_dist = h_data.groupby(by=['statecode', 'detecteddistrict'])[['numcases']].sum()
+r_dist = r_data.groupby(by=['statecode', 'detecteddistrict'])[['numcases']].sum()
+d_dist = d_data.groupby(by=['statecode', 'detecteddistrict'])[['numcases']].sum()
+
+
+def dist_data(h_dist, r_dist, d_dist, statecode, num_case='numcases'):
+    dist_data = h_dist.loc[statecode]
+    try:
+        dist_data['Recovered'] = r_dist.loc[statecode]
+    except:
+        dist_data['Recovered'] = [0]*dist_data.shape[0]
+        
+    try:
+        dist_data['Deceased'] = d_dist.loc[statecode]
+    except:
+        dist_data['Deceased'] = [0]*dist_data.shape[0]
+        
+    dist_data = add_active(dist_data, num_case)
+    return dist_data
+
+# ============================================================================================================================================
+# Saving each State wise file with testing
+for state in data.statecode.unique():
+	if state!="" and st!='State Unassigned':
+		dist_data(h_dist, r_dist, d_dist, state, 'numcases').to_csv("serverData/all_dist_till_date_statewise/"+str(state)+".csv")
+		print("Saved " + state , end = ", ")
+print()
+# ============================================================================================================================================

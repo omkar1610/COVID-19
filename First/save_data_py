@@ -218,7 +218,7 @@ def dist_wise(data, state, district):
         return dist_tl
     except:
         dist_tl = pd.DataFrame(columns=['numcases'], index=h_dist.loc[state, district].index)
-        dist_tl['numcases'] = [0] * dist_df.shape[0]
+        dist_tl['numcases'] = [0] * dist_tl.shape[0]
         dist_tl['total_cases'] = dist_tl['numcases'].cumsum()
         return dist_tl
  
@@ -250,7 +250,7 @@ for st in state_list:
 # ============================================================================================================================================
                 # Saving each dist timeline
                 dist_df.to_csv("serverData/districtwise/"+st+"/"+dist+".csv")
-                print(dist, end=" ")
-print()
+                print(dist, end=", ")
+        print()
 
 # ============================================================================================================================================

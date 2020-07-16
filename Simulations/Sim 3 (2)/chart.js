@@ -1,9 +1,9 @@
 
 function get_chart(){
   return new CanvasJS.Chart("chartContainer", {
-    title:{
-      text: "Just the Title"
-    },
+//    title:{
+//      text: "Just the Title"
+//    },
     theme: "light2", // "light1", "light2", "dark1", "dark2"
     animationEnabled: true,
     // axisX: {

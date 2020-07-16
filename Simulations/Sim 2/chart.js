@@ -15,21 +15,21 @@ function get_chart(){
     data: [
       {        
         type: "stackedArea100",
-        name: "Red",
+        name: "Infected",
        // showInLegend: "true",
         color: "red",
         dataPoints: []
       },
       {        
         type: "stackedArea100",
-        name: "Black",
+        name: "Uninfected",
         color: "black",
         // showInLegend: "true",
         dataPoints: []
       },
       {        
         type: "stackedArea100",
-        name: "Green",
+        name: "Recovered",
         color: "green",
         // showInLegend: "true",
         dataPoints: []

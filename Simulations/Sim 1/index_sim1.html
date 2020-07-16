@@ -22,7 +22,9 @@
 
 
 
-<body>
+<body >
+<!--<body style="background-color:grey;">-->
+
   <!-- Params -->
 
   <div class="box">
@@ -30,11 +32,11 @@
 
     <label>Radius: </label>
     <input id="par_rad" type="range" min="1" max="4" step="0.1" value="3">
-    <label type="number" id="par_rad_text">3</label>
+    <label type="number" id="par_rad_text">3</label><br>
 
     <label>Speed: </label>
     <input id="par_speed" type="range" min="0.1" max="20" step="0.1" value="2">
-    <label type="number" id="par_speed_text">2</label>
+    <label type="number" id="par_speed_text">2</label><br>
 
     <label>Number of Samples: </label>
     <input id="par_n" type="range" min="10" max="500" step="10" value="400">
@@ -42,7 +44,7 @@
 
     <label>Initial Infection: </label>
     <input id="par_init_inf" type="range" min="0.01" max="1" step="0.01" value="0.05">
-    <label type="number" id="par_init_inf_text">0.05</label>
+    <label type="number" id="par_init_inf_text">0.05</label><br>
 
     <label>Infection Probability per Day: </label>
     <input id="par_inf_prob" type="range" min="0.01" max="1" step="0.01"value="0.3">
@@ -54,7 +56,7 @@
 
     <label>Recovery Start Day: </label>
     <input id="par_rec_start" type="range" min="1" max="5" step="1"value="2">
-    <label type="number" id="par_rec_start_text">2</label>
+    <label type="number" id="par_rec_start_text">2</label><br>
 
     <label>Infection Days: </label>
     <input id="par_rec_time" type="range" min="1" max="100" step="1"value="14">
@@ -72,9 +74,9 @@
 
   <div id="chartContainer" style="height: 200px; width: 350px;">
   </div>
-  <!-- Simulation First-->
 
-  <div id='d1' style="position:absolute; z-index:1">  
+    
+  <div id='d1' style = "position:relative; left:380px; top:-200px; z-index:1">  
     <canvas id = 'simulation'></canvas>
   </div>
   

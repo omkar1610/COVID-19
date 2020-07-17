@@ -47,7 +47,9 @@ function init() {
   set_param(param(0, "f"), param(1, "f"),
             param(2, "i"), param(3, "f"),
             param(4, "f"), param(5, "f"),
-            param(6, "i"), param(7, "i"))
+            param(6, "i"), param(7, "i"),
+           param(8, "i"),
+           param(9, "f"),)
 
 	total = 0
 	infected = 0
@@ -101,23 +103,16 @@ function init() {
       }
     
     // Choose initial infect no of sqaures and make 
-    var com1 = randomIntFromRange(0, 9)
-      particles = particles_grid[com1]
-      var tmp = 0
-      for(var i=0;i<N;i++){
-          // Initial Infection 
-        if(Math.random()<0.05){
-          particles[i].color = 'red'
-            particles[i].infect_time = new Date()
-          infected++;
-        }
-      }
-      // All black
-      if(tmp==0){
-          var t = randomIntFromRange(0,N-1)
-        particles[t].color = 'red'
-       particles[t].infect_time = new Date()   
-      }
+    var inf_box = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    var com1
+    for(var i=0;i<init_infected_box;i++){
+        com1 = randomIntFromRange(0, 9)
+        while(inf_box[com1]==1)
+            com1 = randomIntFromRange(0,9)
+        inf_box[com1] = 1
+        infect_box(com1)
+//        console.log("Infected", com1)
+    }
 
     
   updateChart()

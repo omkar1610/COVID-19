@@ -16,6 +16,27 @@ function randomColor() {
   }
 }
 
+function infect_box(box_no){
+//    var com1 = randomIntFromRange(0, 9)
+    particles = particles_grid[box_no]
+      var tmp = 0
+      for(var i=0;i<N;i++){
+          // Initial Infection 
+        if(Math.random()<initial_infect){
+          particles[i].color = 'red'
+            particles[i].infect_time = new Date()
+          infected++;
+        }
+      }
+      // All black
+      if(tmp==0){
+          var t = randomIntFromRange(0,N-1)
+        particles[t].color = 'red'
+       particles[t].infect_time = new Date()   
+      }
+}
+
+
 // If two circles collide or not |c1-c2|<=r1+r2
 // Instead of radius it should check for infection radius
 function isCollision(c1, c2){
@@ -162,8 +183,8 @@ function square_mid(circle){
     col = circle.col
 //    rad = circle.radius
   loc = {
-    y:(row*side_len + (row+1)*side_len)/2,
-    x:(col*side_len + (col+1)*side_len)/2
+    y:row*side_len + side_len/2,
+    x:col*side_len + side_len/2
   };
 //    console.log("mid", row, col, loc)
   return loc;
@@ -253,7 +274,8 @@ class Circle {
       y: (Math.random() - 0.5) * Speed
     };
 
-    this.color = randomColor()
+//    this.color = randomColor()
+    this.color = 'black'
     this.collision = 0;
     
     if(this.color=='red')
@@ -354,7 +376,7 @@ class Circle {
         this.draw()
         
         if(this.central_div=="in_box"){
-            if(Math.random()<0.001){ //prob of going to other box 1%
+            if(Math.random()<prob_move_box){ //prob of going to other box 1%
                 this.central_div = 'to_box'
 //                console.log("To Box", this.row, this.col)
                 get_new_dest(this)
@@ -379,7 +401,7 @@ class Circle {
 
 
 function set_param(rad, speed, n, init_inf, inf_prob, day_per_sec,
-      rec_start, rec_tim) {
+      rec_start, rec_tim, inf_box, move_box) {
   Radius = rad;
   Speed = speed;
   N = n;
@@ -389,7 +411,8 @@ function set_param(rad, speed, n, init_inf, inf_prob, day_per_sec,
   day = day_per_sec
   recovery_start_day = rec_start
   days_for_recovery = rec_tim
-
+    init_infected_box = inf_box
+    prob_move_box = move_box
 
 }
 

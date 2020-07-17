@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Canvas</title>
+  <title>Sim 3</title>
 
   <style>
     canvas {
@@ -26,7 +26,7 @@
   <!-- Params -->
 
   <div class="box">
-    <h1>Simulation 2</h1>
+    <h1>Simulation 3</h1>
 
     <label>Radius: </label>
     <input id="par_rad" type="range" min="1" max="4" step="0.1" value="2">
@@ -39,14 +39,22 @@
     <label>Number of Samples per Square: </label>
     <input id="par_n" type="range" min="10" max="500" step="10" value="50">
     <label type="number" id="par_n_text">50</label><br>
+      
+    <label>No of initially infected boxes: </label>
+    <input id="par_n_inf_box" type="range" min="1" max="9" step="1" value="1">
+    <label type="number" id="par_n_inf_box_text">1</label><br>
 
-    <label>Initial Infection: </label>
+    <label>Initial Infection per Box: </label>
     <input id="par_init_inf" type="range" min="0.01" max="1" step="0.01" value="0.05">
     <label type="number" id="par_init_inf_text">0.05</label><br>
 
     <label>Infection Probability per Day: </label>
     <input id="par_inf_prob" type="range" min="0.01" max="1" step="0.01"value="0.3">
     <label type="number" id="par_inf_prob_text">0.3</label><br>
+      
+    <label>Probability of moving to different box: </label>
+    <input id="par_move_box" type="range" min="0.001" max="0.01" step="0.001"value="0.001">
+    <label type="number" id="par_move_box_text">0.001</label><br>
 
     <label>Day/Sec: </label>
     <input id="par_day_per_sec" type="range" min="1" max="30" step="1" value="1">

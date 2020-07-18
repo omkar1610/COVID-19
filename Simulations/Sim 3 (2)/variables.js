@@ -22,3 +22,5 @@ var infect_rad;
 var randArray;
 
 var init_infected_box, prob_move_box
+
+var sim_data = []

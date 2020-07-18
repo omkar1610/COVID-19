@@ -49,6 +49,7 @@ var updateChart = function () {
   
   tmpData = get_data()
   // console.log(updateCount, tmpData)
+    sim_data.push(tmpData)
 
   chart.options.data[0].dataPoints.push({y : tmpData.red})
   chart.options.data[1].dataPoints.push({y : tmpData.black})
@@ -69,6 +70,10 @@ var resetChart = function () {
   // chart.render();        
 };
 
+function write_file(){
+    var blob = new Blob(sim_data, {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "hello_world.txt");
+}
 
 
 

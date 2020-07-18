@@ -183,7 +183,7 @@ function animate_2() {
 
           // For recovery
           if(particle.color=='red' && (new Date() - particle.infect_time)/1000 > days_for_recovery/day){
-            console.log("recovered")
+//            console.log("recovered")
               particle.color = 'green'
           }
 

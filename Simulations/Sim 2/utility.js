@@ -214,12 +214,12 @@ class Circle {
       go_to_center(this)
     }
     else if(this.central_div=='from'){
-      Speed = 3
+      Speed = 3 * Speed
       go_from_center(this)
     }
 //    if(this.central_div=='boundry'){
     else{
-      Speed = 1
+      Speed = param(1, "f"),
       // this.color = 'yellow'
       boundary_bounce(this)
     }

@@ -24,7 +24,7 @@ function param(no, ivf){
 }
 
 function init() {
-  set_param(param(0, "f"), param(1, "i"),
+  set_param(param(0, "f"), param(1, "f"),
             param(2, "i"), param(3, "f"),
             param(4, "f"), param(5, "f"),
             param(6, "i"), param(7, "i"))

@@ -82,6 +82,7 @@ function init() {
         pp = ppp%3
 //        console.log(pp, qq)
           particles = []
+            var flag_all_black = true
           for(var i=0;i<N;i++){
 
               let tmpCircle = new Circle();
@@ -92,6 +93,7 @@ function init() {
                     tmpCircle.color = 'red'
                     tmpCircle.infect_time = new Date()
                     infected++;
+                    flag_all_black = false
                 }
               else
                   tmpCircle.color = 'black'
@@ -120,7 +122,13 @@ function init() {
               // tmpCircle.draw()
 
           }
-          particles_grid.push(particles)
+        // If all black
+        if(inf_box[ppp] == 1 && flag_all_black == true){
+            var t = randomIntFromRange(0,N-1)
+            particles[t].color = 'red'
+            particles[t].infect_time = new Date()   
+        }
+        particles_grid.push(particles)
       }
     
 //    // Choose initial infect no of sqaures and make 

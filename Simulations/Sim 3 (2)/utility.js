@@ -23,11 +23,11 @@ function infect_box(box_no){
       for(var i=0;i<N;i++){
           // Initial Infection 
         if(Math.random()<initial_infect){
-          particles[i].color = 'red'
+            particles[i].color = 'red'
             particles[i].infect_time = new Date()
-          infected++;
+            infected++;
         }
-      }
+      } 
       // All black
       if(tmp==0){
           var t = randomIntFromRange(0,N-1)
@@ -84,84 +84,6 @@ function boundary_bounce(circle){
    circle.velocity.y = -(Math.random()+0.1) * Speed
  if(circle.y - circle.radius <=0)
      circle.velocity.y = (Math.random()+0.1) * Speed 
-}
-
-// give new speed for going to center
-function go_to_center(circle) {
-  
-  // save old center
-  if (circle.old.flag==false){
-    circle.old.flag = true
-    circle.old.vel_x = circle.velocity.x
-    circle.old.vel_y = circle.velocity.y
-    circle.old.dot_circle = new Circle()
-    circle.old.dot_circle.x = circle.x
-    circle.old.dot_circle.y = circle.y
-    circle.old.dot_circle.radius = 0.1
-  }
-
-  if(isCollision_sim_2(circle, dot_circle)){
-    circle.velocity.x = 0
-    circle.velocity.y = 0
-    circle.central_div = 'from'    
-    console.log("go to center change") 
-  }
-  // Q1
-  else if(circle.x<canvas_sim.height/2 && circle.y<canvas_sim.width/2){
-    circle.velocity.x = (Math.random()+0.1) * Speed
-    circle.velocity.y = (canvas_sim.width/2 - circle.y)/(canvas_sim.height/2 - circle.x)*circle.velocity.x      
-  }
-  // Q2
-  else if(circle.x>canvas_sim.height/2 && circle.y<canvas_sim.width/2){
-    circle.velocity.x = -(Math.random()+0.1) * Speed
-    circle.velocity.y = (canvas_sim.width/2 - circle.y)/(canvas_sim.height/2 - circle.x)*circle.velocity.x      
-  }
-  // Q3
-  else if(circle.x>canvas_sim.height/2 && circle.y>canvas_sim.width/2){
-    circle.velocity.x = -(Math.random()+0.1) * Speed
-    circle.velocity.y = (canvas_sim.width/2 - circle.y)/(canvas_sim.height/2 - circle.x)*circle.velocity.x      
-  }
-  // Q4
-  else if(circle.x<canvas_sim.height/2 && circle.y>canvas_sim.width/2){
-    circle.velocity.x = (Math.random()+0.1) * Speed
-    circle.velocity.y = (canvas_sim.width/2 - circle.y)/(canvas_sim.height/2 - circle.x)*circle.velocity.x      
-  }
-  
-
-}
-
-// give new speed for going out from center
-function go_from_center(circle) {
-  // restore old data once reach the previous position
-  if(isCollision_sim_2(circle, circle.old.dot_circle)){
-    circle.old.flag = false
-    circle.velocity.x = circle.old.vel_x
-    circle.velocity.y = circle.old.vel_y
-    circle.x = circle.old.dot_circle.x
-    circle.y = circle.old.dot_circle.y
-    circle.central_div = 'boundry' //Set diversion boundry to do random walk
-  }
-  // Q1
-  else if(circle.x<circle.old.dot_circle.x && circle.y<circle.old.dot_circle.y){
-    circle.velocity.x = (Math.random()+0.1) * Speed
-    circle.velocity.y = (circle.old.dot_circle.y - circle.y)/(circle.old.dot_circle.x - circle.x)*circle.velocity.x      
-  }
-  // Q2
-  else if(circle.x>circle.old.dot_circle.x && circle.y<circle.old.dot_circle.y){
-    circle.velocity.x = -(Math.random()+0.1) * Speed
-    circle.velocity.y = (circle.old.dot_circle.y - circle.y)/(circle.old.dot_circle.x - circle.x)*circle.velocity.x      
-  }
-  // Q3
-  else if(circle.x>circle.old.dot_circle.x && circle.y>circle.old.dot_circle.y){
-    circle.velocity.x = -(Math.random()+0.1) * Speed
-    circle.velocity.y = (circle.old.dot_circle.y - circle.y)/(circle.old.dot_circle.x - circle.x)*circle.velocity.x      
-  }
-  // Q4
-  else if(circle.x<circle.old.dot_circle.x && circle.y>circle.old.dot_circle.y){
-    circle.velocity.x = (Math.random()+0.1) * Speed
-    circle.velocity.y = (circle.old.dot_circle.y - circle.y)/(circle.old.dot_circle.x - circle.x)*circle.velocity.x      
-  }
-
 }
 
 

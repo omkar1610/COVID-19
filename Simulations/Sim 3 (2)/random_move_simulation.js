@@ -30,7 +30,7 @@ function draw_grid(){
 
   cc.moveTo(0, side_len);
   cc.lineTo(canvas_sim.height, side_len);
-
+    cc.strokeStyle = 'black'
   cc.stroke();
 
 }
@@ -64,44 +64,6 @@ function init() {
     particles_grid = []
     side_len = canvas_sim.height/3
     
-    // Put balls in each box and make everything black
-    for(var qq=0;qq<3;qq++){
-        for(var pp=0;pp<3;pp++){
-          particles = []
-          for(var i=0;i<N;i++){
-
-          let tmpCircle = new Circle();
-          tmpCircle.form_circle(radius=Radius, qq, pp)
-
-          // Make all black
-          tmpCircle.color = 'black'
-
-          tmpCircle.id = i;
-          tmpCircle.colArray = new Array(N).fill(0);
-
-
-
-          if(i!= 0){
-            for(let j = 0;j<particles.length; j++){
-
-              //Get new center till collision resolved
-              if(isCollision(tmpCircle, particles[j])){
-                loc = square_loc(tmpCircle)
-                tmpCircle.x = loc.x; 
-                tmpCircle.y = loc.y;
-                j = -1;
-              }
-            }
-          }
-
-          particles.push(tmpCircle);
-          // tmpCircle.draw()
-
-          }
-          particles_grid.push(particles)
-        }
-      }
-    
     // Choose initial infect no of sqaures and make 
     var inf_box = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     var com1
@@ -110,9 +72,68 @@ function init() {
         while(inf_box[com1]==1)
             com1 = randomIntFromRange(0,9)
         inf_box[com1] = 1
-        infect_box(com1)
+//        infect_box(com1)
 //        console.log("Infected", com1)
     }
+    
+    // Put balls in each box and make everything black
+    for(var ppp=0;ppp<9;ppp++){
+        qq = parseInt(ppp/3)
+        pp = ppp%3
+//        console.log(pp, qq)
+          particles = []
+          for(var i=0;i<N;i++){
+
+              let tmpCircle = new Circle();
+              tmpCircle.form_circle(radius=Radius, qq, pp)
+
+              // Make all black
+              if(inf_box[ppp]==1 && Math.random()<initial_infect){
+                    tmpCircle.color = 'red'
+                    tmpCircle.infect_time = new Date()
+                    infected++;
+                }
+              else
+                  tmpCircle.color = 'black'
+
+                  
+
+              tmpCircle.id = i;
+              tmpCircle.colArray = new Array(N).fill(0);
+
+
+
+              if(i!= 0){
+                for(let j = 0;j<particles.length; j++){
+
+                  //Get new center till collision resolved
+                  if(isCollision(tmpCircle, particles[j])){
+                    loc = square_loc(tmpCircle)
+                    tmpCircle.x = loc.x; 
+                    tmpCircle.y = loc.y;
+                    j = -1;
+                  }
+                }
+              }
+
+              particles.push(tmpCircle);
+              // tmpCircle.draw()
+
+          }
+          particles_grid.push(particles)
+      }
+    
+//    // Choose initial infect no of sqaures and make 
+//    var inf_box = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+//    var com1
+//    for(var i=0;i<init_infected_box;i++){
+//        com1 = randomIntFromRange(0, 9)
+//        while(inf_box[com1]==1)
+//            com1 = randomIntFromRange(0,9)
+//        inf_box[com1] = 1
+//        infect_box(com1)
+////        console.log("Infected", com1)
+//    }
 
     
   updateChart()
@@ -190,8 +211,8 @@ function animate_2() {
 
 
 init()
- doAnim=true
- animate_2()
+// doAnim=true
+// animate_2()
 
 
 function get_data(){
@@ -202,3 +223,88 @@ function get_data(){
   }
   return tmp
 }
+
+
+
+//Even Listener
+var mouse = {
+  x: innerWidth / 2,
+  y: innerHeight / 2
+}
+
+
+// Event Listeners
+addEventListener('mousemove', (event) => {
+  mouse.x = event.clientX
+  mouse.y = event.clientY
+})
+
+addEventListener('resize', () => {
+  canvas_sim.width = 300
+  canvas_sim.height = 300
+
+  init()
+})
+
+
+// Sliders
+
+for(let i=0;i<sldPar.length;i++){
+
+  document.getElementById(sldPar[i]).oninput = function() {
+    document.getElementById(sldPar[i].concat("_text")).innerHTML = this.value;
+
+    console.log(sldPar[i].concat(" slider"), this.value)
+    document.getElementById('reset').click()
+  }
+}
+
+
+pp = document.getElementById('playPause')
+
+// Play Reset Function
+function reset_sim(){
+
+   if (doAnim==false){
+    doAnim = true;
+    init();
+    animate_2();
+  }
+  else
+    init();
+    
+  pp.innerText = "Pause";
+  end_flag=false
+}
+
+function start(){
+  doAnim = true;
+  animate_2();
+  pp.innerText = "Pause";
+  chart.render()
+}
+
+function pause(){
+  doAnim = false;
+  pp.innerText = "Resume";
+}
+
+
+// Play Reset Butt
+
+pp.addEventListener('click', function(){
+  if (doAnim==false)
+    start()
+  else
+    pause()
+})
+
+document.getElementById('reset').addEventListener('click', function(){
+  resetChart()
+  console.log("reset");
+  // pause()
+
+  reset_sim()
+  // infect = 0;
+  // console.log(infected, N)
+})

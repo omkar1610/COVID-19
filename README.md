@@ -8,6 +8,9 @@
   <a href="https://omkar1610.github.io/COVID-19/Simulations/Sim%203%20(2)/index_sim1.html">Simulation 3</a><br>  
 <!--   <a href="https://omkar1610.github.io/COVID-19/Simulations/Sim%203%20-%20Copy/index_sim3.html">Simulation 3-Copy</a><br> -->
   
+  
+  <a href="https://omkar1610.github.io/COVID-19/tt.html">Report</a><br> 
+  
 
 </head>
 
